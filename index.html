@@ -2,10 +2,141 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Mon Serveur Docker</title>
+    <title>Docker - Attrape-moi si tu peux !</title>
+    <!-- Chargement d'une police moderne -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            text-align: center;
+            background-color: #f4f6f9;
+            color: #1d2d44;
+            overflow: hidden;
+            margin: 0;
+            height: 100vh; /* Prend toute la hauteur de l'écran */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        /* Le conteneur de la carte */
+        .main-card {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            max-width: 500px;
+            width: 90%;
+        }
+        h1 {
+            color: #0db7ed; /* Bleu Docker */
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+        }
+        p {
+            font-size: 1.1rem;
+            color: #4a5568;
+            margin-top: 0;
+        }
+        #score-container {
+            margin-top: 20px;
+            font-size: 1.2rem;
+            color: #2d3748;
+        }
+        #score {
+            font-weight: bold;
+            color: #0db7ed;
+            font-size: 1.5rem;
+        }
+        /* Le bouton aux couleurs de Docker */
+        #fuyant {
+            position: absolute; /* Par rapport à la fenêtre */
+            padding: 18px 35px;
+            font-size: 20px;
+            font-weight: bold;
+            background-color: #0db7ed; /* Bleu Docker */
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: all 0.3s ease; /* Transition douce */
+            z-index: 10; /* S'assure qu'il est au-dessus de tout */
+        }
+        #fuyant:hover:not(.arrete) {
+            background-color: #0991b8;
+            transform: scale(1.05); /* Légère augmentation au survol */
+        }
+        /* Style du bouton une fois arrêté */
+        #fuyant.arrete {
+            background-color: #38a169; /* Vert succès */
+            cursor: pointer !important;
+            transform: scale(1) !important;
+            position: static !important; /* Annule le positionnement absolu */
+            margin-top: 30px;
+        }
+    </style>
 </head>
 <body>
-    <h1>Bienvenue sur le serveur web Docker de Quelin Rémy!</h1>
-    <p>Ce site tourne dans un conteneur Python.</p>
+
+    <div class="main-card">
+        <h1>🐳 Docker Game</h1>
+        <p>Essaie de cliquer sur le bouton (si tu y arrives)...</p>
+        
+        <div id="score-container">
+            Le conteneur s'est esquivé : <span id="score">0</span> fois.
+        </div>
+    </div>
+    
+    <!-- Le bouton est en dehors du card pour bouger librement -->
+    <button id="fuyant">Essaie de m'attraper !</button>
+
+    <script>
+        const bouton = document.getElementById('fuyant');
+        const scoreSpan = document.getElementById('score');
+        let evitements = 0;
+
+        function deplacerBouton() {
+            // *** NOUVELLE LOGIQUE *** : On arrête de bouger à 50
+            if (evitements >= 20) {
+                bouton.textContent = "Tu as gagné ! Clique ici ! 🎉";
+                bouton.classList.add('arrete'); // Change le style
+                return; // Stoppe l'exécution de la fonction
+            }
+
+            const maxX = window.innerWidth - bouton.offsetWidth - 40;
+            const maxY = window.innerHeight - bouton.offsetHeight - 40;
+            
+            const randomX = Math.max(20, Math.floor(Math.random() * maxX));
+            const randomY = Math.max(20, Math.floor(Math.random() * maxY));
+
+            bouton.style.left = randomX + 'px';
+            bouton.style.top = randomY + 'px';
+
+            evitements++;
+            scoreSpan.textContent = evitements;
+        }
+
+        // Le bouton bouge si on le survole, sauf s'il est arrêté
+        bouton.addEventListener('mouseover', deplacerBouton);
+        
+        // Clic final
+        bouton.addEventListener('click', function() {
+            if (evitements >= 50 || bouton.classList.contains('arrete')) {
+                 alert('Félicitations ! Tu as finalement capturé le conteneur Docker après ' + evitements + ' tentatives ! 🏆');
+                 // Réinitialiser le jeu
+                 evitements = 0;
+                 scoreSpan.textContent = evitements;
+                 bouton.textContent = "Essaie de m'attraper !";
+                 bouton.classList.remove('arrete');
+                 bouton.style.position = 'absolute';
+                 deplacerBouton(); // Le replace au centre pour recommencer
+            } else {
+                 // Si l'utilisateur clique "par erreur" avant 50
+                 alert('Trop rapide ! Essaie encore ! 😉');
+            }
+        });
+    </script>
+
 </body>
 </html>
